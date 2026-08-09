@@ -94,10 +94,13 @@ build/
 ├── validation_report.json
 ├── export_report.json
 └── release/
-    └── GLB/
-        ├── Residential/
-        ├── Commercial/
-        └── Skyscraper/
+    ├── GLB/
+    │   ├── Residential/
+    │   ├── Commercial/
+    │   └── Skyscraper/
+    └── Manifest/
+        ├── asset_manifest.json
+        └── asset_manifest.csv
 ```
 
 To smoke-test one or more assets, pass `--asset` after Blender's separator:
@@ -113,3 +116,43 @@ The exporter selects one object at a time, temporarily places its object origin
 at world `0, 0, 0`, exports only that object, and restores the exact catalogue
 world matrix and the original selection state. It does not save the `.blend`
 or touch the existing top-level `GLB/` directory.
+
+## Generate the release manifest
+
+A complete export also writes JSON and CSV manifests during the same Blender
+run. Both formats come from one canonical in-memory record list, so their asset
+data cannot diverge through separate implementations. The manifest includes
+dimensions, vertex and triangle counts, UV layers, materials, texture families,
+texture references, validation status, and actual generated GLB sizes.
+
+Partial runs using `--asset` deliberately skip manifest replacement, preventing
+a smoke test from overwriting the complete 27-asset manifest.
+
+## Render individual previews
+
+The preview renderer creates an unsaved temporary Eevee studio scene, links one
+asset copy at a time at world origin, frames the camera from evaluated bounds,
+and atomically writes a square PNG. It deletes all temporary scene data before
+Blender exits and never saves the catalogue.
+
+```sh
+blender --background Blender/low-poly-cyberpunk-buildings-pack.blend \
+  --python-exit-code 2 \
+  --python automation/blender/render_previews.py
+```
+
+Default outputs:
+
+```text
+build/
+├── preview_report.json
+└── release/
+    └── Preview/
+        ├── Residential/
+        ├── Commercial/
+        └── Skyscraper/
+```
+
+Use `--asset RES_01` after Blender's `--` separator for a targeted smoke test.
+Resolution, camera lens, frame padding, view direction, background, and ground
+colors are configured in `automation/config/release_config.json`.

@@ -45,5 +45,29 @@
     "triangle_warning": 10000,
     "material_slot_warning": 4,
     "texture_dimension_warning": 4096
+  },
+  "preview": {
+    "resolution": [
+      512,
+      512
+    ],
+    "lens_mm": 58.0,
+    "frame_padding": 1.18,
+    "view_direction": [
+      1.4,
+      -1.6,
+      1.1
+    ],
+    "background_color": [
+      0.012,
+      0.018,
+      0.03
+    ],
+    "ground_color": [
+      0.045,
+      0.055,
+      0.075,
+      1.0
+    ]
   }
 }

@@ -47,8 +47,17 @@ def display_path(path: Path) -> str:
         return resolved.name
 
 
-def write_json_atomic(path: Path, data: Dict[str, Any]) -> None:
-    """Write complete JSON or leave the previous report untouched on failure."""
+def require_build_path(path: Path, label: str) -> None:
+    """Reject generated output paths outside this repository's build directory."""
+    build_root = (REPOSITORY_ROOT / "build").resolve()
+    try:
+        path.resolve().relative_to(build_root)
+    except ValueError as error:
+        raise ValueError(f"{label} must be inside {build_root}") from error
+
+
+def write_text_atomic(path: Path, text: str) -> None:
+    """Write complete text or leave the previous file untouched on failure."""
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary_name = None
     try:
@@ -61,8 +70,7 @@ def write_json_atomic(path: Path, data: Dict[str, Any]) -> None:
             delete=False,
         ) as handle:
             temporary_name = handle.name
-            json.dump(data, handle, indent=2, sort_keys=False)
-            handle.write("\n")
+            handle.write(text)
             handle.flush()
             os.fsync(handle.fileno())
         os.replace(temporary_name, path)
@@ -70,3 +78,9 @@ def write_json_atomic(path: Path, data: Dict[str, Any]) -> None:
         if temporary_name and os.path.exists(temporary_name):
             os.unlink(temporary_name)
         raise
+
+
+def write_json_atomic(path: Path, data: Dict[str, Any]) -> None:
+    """Serialize JSON and write it atomically."""
+    text = json.dumps(data, indent=2, sort_keys=False) + "\n"
+    write_text_atomic(path, text)

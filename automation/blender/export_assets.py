@@ -22,9 +22,11 @@ from common import (  # noqa: E402
     deep_merge,
     display_path,
     load_json,
+    require_build_path,
     resolve_from_repository,
     write_json_atomic,
 )
+from manifest import write_release_manifest  # noqa: E402
 from validate_assets import DEFAULT_CONFIG, validate_scene  # noqa: E402
 
 
@@ -57,20 +59,17 @@ def parse_arguments(argv: Sequence[str]) -> argparse.Namespace:
         help="Machine-readable export report path",
     )
     parser.add_argument(
+        "--manifest-dir",
+        default="build/release/Manifest",
+        help="JSON/CSV manifest directory; it must be inside build",
+    )
+    parser.add_argument(
         "--asset",
         action="append",
         default=[],
         help="Export only this asset ID; may be supplied more than once",
     )
     return parser.parse_args(argv)
-
-
-def require_build_path(path: Path, label: str) -> None:
-    build_root = (REPOSITORY_ROOT / "build").resolve()
-    try:
-        path.resolve().relative_to(build_root)
-    except ValueError as error:
-        raise ValueError(f"{label} must be inside {build_root}") from error
 
 
 def collect_assets(config: Dict[str, Any]) -> List[Tuple[str, Any]]:
@@ -161,9 +160,11 @@ def main() -> int:
     output_directory = resolve_from_repository(arguments.output_dir)
     validation_report_path = resolve_from_repository(arguments.validation_report)
     export_report_path = resolve_from_repository(arguments.report)
+    manifest_directory = resolve_from_repository(arguments.manifest_dir)
     require_build_path(output_directory, "Output directory")
     require_build_path(validation_report_path, "Validation report")
     require_build_path(export_report_path, "Export report")
+    require_build_path(manifest_directory, "Manifest directory")
 
     config = deep_merge(DEFAULT_CONFIG, load_json(config_path))
     validation_report = validate_scene(config)
@@ -215,10 +216,32 @@ def main() -> int:
         bpy.context.view_layer.objects.active = original_active
         bpy.context.view_layer.update()
 
+    if failures:
+        manifest_result: Dict[str, Any] = {
+            "status": "skipped",
+            "reason": "One or more asset exports failed",
+        }
+    elif requested_assets:
+        manifest_result = {
+            "status": "skipped",
+            "reason": "Partial --asset exports do not replace the full release manifest",
+        }
+    else:
+        try:
+            manifest_result = write_release_manifest(
+                manifest_directory, validation_report, exported, config
+            )
+        except Exception as error:
+            manifest_result = {
+                "status": "error",
+                "error": f"{type(error).__name__}: {error}",
+            }
+
+    pipeline_failed = bool(failures) or manifest_result["status"] == "error"
     report = {
         "schema_version": 1,
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
-        "status": "error" if failures else "pass",
+        "status": "error" if pipeline_failed else "pass",
         "source_blend": display_path(Path(bpy.data.filepath)),
         "blender_version": bpy.app.version_string,
         "output_directory": display_path(output_directory),
@@ -230,6 +253,7 @@ def main() -> int:
         },
         "assets": exported,
         "failures": failures,
+        "manifest": manifest_result,
     }
     write_json_atomic(export_report_path, report)
     print(
@@ -237,7 +261,7 @@ def main() -> int:
         f"{len(failures)} failed"
     )
     print(f"Export report: {display_path(export_report_path)}")
-    return 1 if failures else 0
+    return 1 if pipeline_failed else 0
 
 
 if __name__ == "__main__":

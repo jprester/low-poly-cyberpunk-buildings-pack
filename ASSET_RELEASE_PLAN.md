@@ -111,7 +111,18 @@ Use one internal JSON representation and derive CSV from it.
 
 Avoid maintaining two independent implementations.
 
+Generate both files from the exporter's fresh validation data and actual GLB
+results during a complete export run. Partial `--asset` smoke tests must not
+replace the full release manifest.
+
 Phase 5 — Automated Preview Renderer
+
+Implementation output:
+
+build/release/Preview/<Category>/<ASSET_ID>_preview.png
+
+Render from an unsaved temporary scene and write previews atomically. The
+source catalogue must remain unchanged.
 
 Generate standardized previews.
 
