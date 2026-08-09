@@ -196,15 +196,17 @@ Do not generate excessive marketing language.
 
 Phase 8 — Three.js Smoke Test
 
-Create minimal Vite + Three.js application.
-
-Example structure:
+Implementation output:
 
 examples/threejs/
 ├── package.json
 ├── index.html
+├── vite.config.ts
 └── src/
-└── main.ts
+    ├── main.ts
+    └── styles.css
+
+Create minimal Vite + Three.js application.
 
 Load at least:
 
@@ -225,6 +227,18 @@ Optional:
 bloom toggle
 
 Make this a simple compatibility demonstration.
+
+During local development, serve the representative assets directly from
+`build/release/GLB` instead of copying generated binaries into Git. The
+production bundle assumes it will be placed at `ThreeJS_Example/dist` beside
+the release `GLB` directory, with an environment-variable override available
+for other hosting layouts.
+
+The implemented smoke test loads `RES_01`, `COM_06`, and `SKY_01` at native
+scale, grounds their evaluated bounds at Y=0, and fails its visible status if
+any representative asset lacks PBR, emissive, or normal-mapped materials.
+Browser verification completed with all three assets passing and no console
+warnings or errors.
 
 Phase 9 — Release Builder
 

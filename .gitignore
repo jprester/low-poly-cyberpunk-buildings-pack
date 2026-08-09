@@ -12,7 +12,11 @@
 # Generated release output
 /build/
 /dist/
+/examples/threejs/dist/
 *.zip
+
+# JavaScript dependencies
+node_modules/
 
 # Blender temporary and recovery files
 *.blend@

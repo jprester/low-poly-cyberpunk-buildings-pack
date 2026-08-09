@@ -1,8 +1,9 @@
 # Asset validation automation
 
 Release automation is implemented incrementally through manifest generation,
-individual and collection preview rendering, and manifest-driven documentation.
-Packaging and source-asset repair are not performed here.
+individual and collection preview rendering, manifest-driven documentation,
+and a Three.js compatibility example. Packaging and source-asset repair are
+not performed here.
 
 ## Safety
 
@@ -210,3 +211,32 @@ from `build/release/Manifest/asset_manifest.json`.
 
 License terms are not generated automatically. Supply an approved
 `LICENSE.txt` before release packaging.
+
+## Run the Three.js compatibility example
+
+The Phase 8 example loads one generated residential, commercial, and
+skyscraper GLB with Three.js. It preserves native dimensions, grounds each
+model from its evaluated bounds, and checks for PBR, emissive, and normal-map
+materials.
+
+Generate the release GLBs first, then run:
+
+```sh
+cd examples/threejs
+npm install
+npm run dev
+```
+
+Open `http://127.0.0.1:4173/`. The development server reads directly from
+`build/release/GLB`; generated GLBs are not copied into the tracked example.
+
+Type-check and build the distributable web bundle with:
+
+```sh
+cd examples/threejs
+npm run build
+```
+
+The build is written to ignored `examples/threejs/dist/`. See
+`examples/threejs/README.md` for packaged-release paths and the
+`VITE_ASSET_BASE_URL` override.
