@@ -226,24 +226,22 @@ class PreviewStudio:
         self.scene.view_layers[0].update()
         self.camera.data.clip_end = distance + max(size) * 8.0
 
-        ground_radius = max(size.x, size.y) * 2.5
+        ground_radius = max(size.x, size.y) * float(
+            self.settings.get("ground_scale_factor", 2.5)
+        )
         self.ground.scale = (ground_radius, ground_radius, 1.0)
-        self.ground.location.z = min(corner.z for corner in corners) - 0.02
+        self.ground.location = (
+            target.x,
+            target.y,
+            min(corner.z for corner in corners) - 0.02,
+        )
         return distance
 
-    def render_asset(self, source_obj: Any, output_path: Path, depsgraph: Any) -> Dict[str, Any]:
-        preview_obj = source_obj.copy()
-        preview_obj.name = f"{TEMPORARY_PREFIX}{source_obj.name}"
-        preview_obj.parent = None
-        preview_obj.matrix_world = Matrix.Identity(4)
-        preview_obj.hide_render = False
-        self.scene.collection.objects.link(preview_obj)
-        corners, size = evaluated_local_bounds(source_obj, depsgraph)
-        camera_distance = self.frame_asset(corners, size)
-
+    def render_to_path(self, output_path: Path, label: str) -> Dict[str, Any]:
+        """Atomically render the current temporary studio scene to a PNG."""
         output_path.parent.mkdir(parents=True, exist_ok=True)
         descriptor, temporary_name = tempfile.mkstemp(
-            prefix=f".{source_obj.name}.", suffix=".png", dir=str(output_path.parent)
+            prefix=f".{label}.", suffix=".png", dir=str(output_path.parent)
         )
         os.close(descriptor)
         temporary_path = Path(temporary_name)
@@ -261,13 +259,27 @@ class PreviewStudio:
                 "path": display_path(output_path),
                 "size_bytes": size_bytes,
                 "resolution_px": [self.scene.render.resolution_x, self.scene.render.resolution_y],
-                "camera_distance_m": round(camera_distance, 6),
-                "asset_dimensions_m": [round(float(value), 6) for value in size],
             }
         finally:
-            bpy.data.objects.remove(preview_obj, do_unlink=True)
             if temporary_path.exists():
                 temporary_path.unlink()
+
+    def render_asset(self, source_obj: Any, output_path: Path, depsgraph: Any) -> Dict[str, Any]:
+        preview_obj = source_obj.copy()
+        preview_obj.name = f"{TEMPORARY_PREFIX}{source_obj.name}"
+        preview_obj.parent = None
+        preview_obj.matrix_world = Matrix.Identity(4)
+        preview_obj.hide_render = False
+        self.scene.collection.objects.link(preview_obj)
+        corners, size = evaluated_local_bounds(source_obj, depsgraph)
+        camera_distance = self.frame_asset(corners, size)
+        try:
+            result = self.render_to_path(output_path, source_obj.name)
+            result["camera_distance_m"] = round(camera_distance, 6)
+            result["asset_dimensions_m"] = [round(float(value), 6) for value in size]
+            return result
+        finally:
+            bpy.data.objects.remove(preview_obj, do_unlink=True)
 
     def close(self) -> None:
         bpy.data.scenes.remove(self.scene)

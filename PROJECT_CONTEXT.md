@@ -143,6 +143,8 @@ The models use shared texture atlases.
 
 This is important to the design of the asset pack.
 
+The Residential atlas includes Base Color, Roughness, Emission and Normal maps.
+
 Most visual detail comes from:
 
 - facade textures

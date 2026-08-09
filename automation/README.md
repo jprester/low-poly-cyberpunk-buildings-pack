@@ -1,8 +1,8 @@
 # Asset validation automation
 
-Only Phase 1 (minimal setup) and Phase 2 (validation) are implemented. No
-export, rendering, documentation generation, packaging, or source-asset repair
-is performed here.
+Release automation is implemented incrementally through manifest generation,
+individual and collection preview rendering, and manifest-driven documentation.
+Packaging and source-asset repair are not performed here.
 
 ## Safety
 
@@ -156,3 +156,57 @@ build/
 Use `--asset RES_01` after Blender's `--` separator for a targeted smoke test.
 Resolution, camera lens, frame padding, view direction, background, and ground
 colors are configured in `automation/config/release_config.json`.
+
+## Render collection overviews
+
+The overview renderer automatically arranges each category into centered rows,
+using the largest footprint in that category to calculate collision-free cell
+spacing. Asset copies are aligned to a common ground plane, framed from the
+combined bounds, and removed after each render.
+
+```sh
+blender --background Blender/low-poly-cyberpunk-buildings-pack.blend \
+  --python-exit-code 2 \
+  --python automation/blender/render_collection_overviews.py
+```
+
+Default outputs:
+
+```text
+build/release/Preview/
+├── residential_collection.png
+├── commercial_collection.png
+└── skyscraper_collection.png
+```
+
+Overview resolution and spacing are configured under `collection_overview` in
+`automation/config/release_config.json`. Use `--category Residential` after
+Blender's `--` separator to render only one configured category.
+
+## Generate release documentation
+
+Documentation generation is a standalone Python step; Blender is not required.
+It reads the canonical JSON manifest, calculates pack statistics, fills the
+README template, and copies the AI disclosure template.
+
+```sh
+python3 automation/scripts/generate_docs.py
+```
+
+Default outputs:
+
+```text
+build/
+├── documentation_report.json
+└── release/
+    └── Documentation/
+        ├── README.md
+        └── AI_DISCLOSURE.md
+```
+
+Product and usage copy remains in `automation/templates/README.template.md`.
+Counts, category ranges, material lists, and GLB size statistics are generated
+from `build/release/Manifest/asset_manifest.json`.
+
+License terms are not generated automatically. Supply an approved
+`LICENSE.txt` before release packaging.

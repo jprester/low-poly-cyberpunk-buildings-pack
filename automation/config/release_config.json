@@ -9,7 +9,8 @@
     "MAT_Residential_Atlas": [
       "base_color",
       "roughness",
-      "emission"
+      "emission",
+      "normal"
     ],
     "MAT_Commercial_Atlas_A": [
       "base_color",
@@ -69,5 +70,14 @@
       0.075,
       1.0
     ]
+  },
+  "collection_overview": {
+    "resolution": [
+      1024,
+      1024
+    ],
+    "frame_padding": 1.1,
+    "spacing_factor": 1.4,
+    "ground_scale_factor": 10.0
   }
 }

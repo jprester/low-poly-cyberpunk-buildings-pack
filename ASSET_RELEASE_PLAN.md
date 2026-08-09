@@ -146,6 +146,16 @@ Do not hardcode camera distance per category if bounding-box framing can solve i
 
 Phase 6 — Collection Overview Renderer
 
+Implementation output:
+
+build/release/Preview/residential_collection.png
+build/release/Preview/commercial_collection.png
+build/release/Preview/skyscraper_collection.png
+
+Use the same temporary studio as individual previews. Compute grid spacing from
+category footprint bounds, align every linked copy to a common ground plane,
+and frame the combined layout automatically.
+
 Generate three overview images:
 
 residential_collection.png
@@ -157,6 +167,18 @@ Automatically lay models out in rows with enough spacing to avoid overlap.
 Prefer consistent ground alignment.
 
 Phase 7 — Documentation Generator
+
+Implementation output:
+
+build/release/Documentation/README.md
+build/release/Documentation/AI_DISCLOSURE.md
+
+Keep product and usage copy in tracked Markdown templates. Inject calculated
+statistics from the canonical JSON manifest, copy the AI disclosure template,
+and reject absolute local paths in generated release documentation.
+
+Do not invent license terms. An approved `LICENSE.txt` remains a required input
+before packaging.
 
 Read asset_manifest.json.
 
