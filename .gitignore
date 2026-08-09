@@ -1,0 +1,34 @@
+# Source and generated 3D binaries
+/Blender/*.blend
+/Blender/*.blend[0-9]*
+/GLB/
+*.glb
+*.gltf
+*.bin
+
+# Source texture artwork and generated images
+/Textures/
+
+# Generated release output
+/build/
+/dist/
+*.zip
+
+# Blender temporary and recovery files
+*.blend@
+*.blend~
+*.blend2
+*.blend3
+
+# Python caches and local environments
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# OS and editor metadata
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~

@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "collections": {
+    "Residential": "RES",
+    "Commercial": "COM",
+    "Skyscraper": "SKY"
+  },
+  "material_requirements": {
+    "MAT_Residential_Atlas": [
+      "base_color",
+      "roughness",
+      "emission"
+    ],
+    "MAT_Commercial_Atlas_A": [
+      "base_color",
+      "roughness",
+      "emission",
+      "normal"
+    ],
+    "MAT_Commercial_Atlas_B": [
+      "base_color",
+      "roughness",
+      "emission",
+      "normal"
+    ],
+    "MAT_Commercial_Atlas_C": [
+      "base_color",
+      "roughness",
+      "emission",
+      "normal"
+    ],
+    "MAT_Industrial_Atlas": [
+      "base_color",
+      "roughness",
+      "emission",
+      "normal"
+    ]
+  },
+  "thresholds": {
+    "transform_epsilon": 0.0001,
+    "origin_ground_warning_m": 0.01,
+    "origin_ground_error_m": 0.1,
+    "origin_center_warning_m": 0.1,
+    "origin_center_warning_ratio": 0.01,
+    "triangle_warning": 10000,
+    "material_slot_warning": 4,
+    "texture_dimension_warning": 4096
+  }
+}
