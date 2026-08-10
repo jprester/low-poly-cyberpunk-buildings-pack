@@ -240,3 +240,73 @@ npm run build
 The build is written to ignored `examples/threejs/dist/`. See
 `examples/threejs/README.md` for packaged-release paths and the
 `VITE_ASSET_BASE_URL` override.
+
+## Build the complete release
+
+Phase 9 is orchestrated by one standalone Python command. Before deleting or
+regenerating anything, it checks the Blender source, texture sources, Three.js
+files, Blender executable, npm executable, automation scripts, and approved
+license.
+
+Run the non-destructive preflight first:
+
+```sh
+python3 automation/scripts/build_release.py --preflight-only
+```
+
+The approved asset license is tracked as `LICENSE.txt` at the repository root.
+`THIRD_PARTY_NOTICES.txt` separately preserves the Three.js MIT notice. You may
+point to an approved license stored elsewhere without copying it first:
+
+```sh
+python3 automation/scripts/build_release.py \
+  --preflight-only \
+  --license /absolute/path/to/approved-LICENSE.txt
+```
+
+The automation verifies only that the supplied file exists. Approval and the
+legal accuracy of its terms remain a human responsibility.
+
+After preflight passes, run the complete build:
+
+```sh
+python3 automation/scripts/build_release.py
+```
+
+The builder then:
+
+1. Clears only the repository's generated `build/` directory.
+2. Validates the Blender catalogue and stops on validation errors.
+3. Exports every GLB and the canonical JSON/CSV manifest.
+4. Renders individual previews and collection overviews.
+5. Generates release documentation.
+6. Builds the Three.js example from its lockfile in temporary build space.
+7. Copies the Blender source, source textures, approved asset license,
+   third-party notices, and generated outputs into a temporary release
+   directory.
+8. Generates `RELEASE_NOTES.md` and `RELEASE_SUMMARY.json`.
+9. Creates the ZIP and atomically installs both final outputs.
+
+Default outputs:
+
+```text
+dist/
+├── Cyberpunk_Building_Pack_v1.0/
+└── Cyberpunk_Building_Pack_v1.0.zip
+```
+
+Machine-readable pipeline status is written to
+`build/release_build_report.json`. Existing `dist/` outputs are preserved if a
+pipeline or ZIP stage fails. Generated copies omit `.DS_Store`, Blender backup
+files, Python caches, `.git`, and `node_modules`.
+
+If Blender is not detected automatically, use `--blender` or `BLENDER_BIN`:
+
+```sh
+python3 automation/scripts/build_release.py \
+  --blender /Applications/Blender.app/Contents/MacOS/Blender
+```
+
+The asset license terms are a project-owner decision and should receive legal
+review when appropriate. Phase 10 performs independent verification of the
+completed directory and ZIP and has not started yet.

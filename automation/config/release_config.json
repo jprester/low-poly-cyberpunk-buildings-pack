@@ -79,5 +79,14 @@
     "frame_padding": 1.1,
     "spacing_factor": 1.4,
     "ground_scale_factor": 10.0
+  },
+  "release": {
+    "package_name": "Cyberpunk_Building_Pack",
+    "version": "1.0",
+    "source_blend": "Blender/low-poly-cyberpunk-buildings-pack.blend",
+    "textures_directory": "Textures",
+    "license_file": "LICENSE.txt",
+    "third_party_notices": "THIRD_PARTY_NOTICES.txt",
+    "threejs_example": "examples/threejs"
   }
 }

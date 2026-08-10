@@ -18,7 +18,7 @@ GLB/           Individual buildings organized by category
 Textures/      Shared source texture atlases
 Manifest/      JSON and CSV asset metadata
 Preview/       Individual previews and collection overviews
-Documentation/ Release documentation and AI disclosure
+Documentation/ Release documentation, license, notices, and AI disclosure
 ```
 
 ## Scale, transforms, and placement
@@ -105,3 +105,9 @@ are embedded in each GLB.
 ## AI disclosure
 
 See [AI_DISCLOSURE.md](AI_DISCLOSURE.md).
+
+## License and third-party notices
+
+Use of the original assets is governed by [LICENSE.txt](LICENSE.txt). Third-party
+software remains subject to the terms reproduced in
+[THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt).

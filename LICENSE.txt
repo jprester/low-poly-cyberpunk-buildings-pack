@@ -1,0 +1,85 @@
+LOW-POLY CYBERPUNK BUILDINGS PACK — COMMERCIAL ASSET LICENSE
+
+Copyright (c) 2026 Janko Prester. All rights reserved.
+
+This license applies to the original 3D models, textures, materials, preview
+images, manifests, documentation, and example integration code included with
+the Low-Poly Cyberpunk Buildings Pack (collectively, the "Assets"). It does
+not apply to third-party software identified in THIRD_PARTY_NOTICES.txt.
+
+1. License grant
+
+Subject to these terms, Janko Prester (the "Licensor") grants the individual
+or single legal entity that lawfully acquired the Assets (the "Licensee") a
+perpetual, worldwide, non-exclusive, non-transferable, royalty-free license to:
+
+- use and modify the Assets;
+- incorporate the Assets into any number of personal or commercial end
+  products, including games, applications, websites, films, images,
+  visualizations, and other interactive or rendered media; and
+- distribute, sell, publicly display, and otherwise exploit those end
+  products without paying additional royalties to the Licensor.
+
+An "end product" is a larger work in which the Assets are incorporated and
+are not distributed as standalone assets or in a form intended for extraction
+or reuse as an asset library.
+
+Attribution is not required.
+
+2. Team and contractor access
+
+The Licensee may provide the Assets to its employees and contractors only when
+they need access to create an end product for the Licensee. Those people must
+be bound by confidentiality or other terms that prevent unauthorized use or
+distribution. Contractors must delete their copies when their work for the
+Licensee ends. This permission does not transfer the license to them for use
+in unrelated projects.
+
+3. Restrictions
+
+The Licensee may not, whether in original or modified form:
+
+- sell, resell, redistribute, sublicense, share, publish, upload, or otherwise
+  make the Assets available as standalone files or source assets;
+- include the Assets in an asset pack, stock-asset collection, template,
+  library, marketplace listing, or other product whose primary value is the
+  Assets themselves;
+- distribute an end product in a form designed to allow end users to extract,
+  download, or reuse the Assets separately from that end product;
+- share the Assets with another person or legal entity except as expressly
+  allowed for employees and contractors above; or
+- claim authorship or ownership of the original Assets.
+
+These restrictions apply equally to converted, adapted, and modified versions
+of the Assets. Ordinary technical extraction that may be possible from a
+compiled or packaged end product does not by itself violate this license when
+the Licensee has taken reasonable steps to prevent reuse of the Assets as
+standalone content.
+
+4. Ownership
+
+The Assets are licensed, not sold. The Licensor retains all ownership and
+intellectual-property rights in the original Assets. The Licensee retains its
+rights in its own original contributions and end products, subject to the
+Licensor's ownership of the Assets.
+
+5. Third-party software
+
+Third-party software remains subject to its own license terms. The Three.js
+software included in or used by the compatibility example is licensed under
+the MIT License reproduced in THIRD_PARTY_NOTICES.txt. Nothing in this asset
+license limits rights granted by a third-party license.
+
+6. Disclaimer and limitation of liability
+
+THE ASSETS ARE PROVIDED "AS IS", WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, TITLE, AND NON-INFRINGEMENT. TO THE MAXIMUM EXTENT PERMITTED BY LAW,
+THE LICENSOR WILL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL,
+CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR FOR ANY LOSS OF PROFITS, DATA, BUSINESS,
+OR GOODWILL, ARISING FROM THE ASSETS OR THIS LICENSE.
+
+Nothing in this section excludes or limits a right or liability that cannot be
+excluded or limited under applicable law.
+
+By using the Assets, the Licensee agrees to these terms.

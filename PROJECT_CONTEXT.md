@@ -243,9 +243,11 @@ low-poly-cyberpunk-buildings-pack/
 ├── Documentation/
 │   ├── README.md
 │   ├── LICENSE.txt
+│   ├── THIRD_PARTY_NOTICES.txt
 │   └── AI_DISCLOSURE.md
 │
-└── RELEASE_NOTES.md
+├── RELEASE_NOTES.md
+└── RELEASE_SUMMARY.json
 ```
 
 ---

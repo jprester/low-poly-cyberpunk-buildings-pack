@@ -242,9 +242,13 @@ warnings or errors.
 
 Phase 9 — Release Builder
 
+Implementation output:
+
+automation/scripts/build_release.py
+
 Create one command:
 
-python automation/scripts/build_release.py
+python3 automation/scripts/build_release.py
 
 The orchestrator should:
 
@@ -266,6 +270,19 @@ Example final output:
 dist/
 ├── Cyberpunk_Building_Pack_v1.0/
 └── Cyberpunk_Building_Pack_v1.0.zip
+
+Preflight all source files and external executables before clearing `build/`.
+An approved `LICENSE.txt` is mandatory and must never be invented by the
+automation. Assemble the release in a temporary directory under `dist/`, then
+replace generated directory/ZIP outputs only after every stage and ZIP creation
+succeeds. Preserve any previous generated release when a later step fails.
+
+The implemented builder writes `build/release_build_report.json`, filters OS,
+Blender-backup, Python-cache, Git, and JavaScript-dependency artifacts while
+copying, and creates factual `RELEASE_NOTES.md` and `RELEASE_SUMMARY.json`
+files. Its missing-license failure path was tested before the approved asset
+license was added. The Three.js MIT license is preserved separately in
+`THIRD_PARTY_NOTICES.txt`.
 Phase 10 — Release Verification
 
 Automate basic checks:
