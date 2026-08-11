@@ -345,3 +345,29 @@ python3 automation/scripts/build_release.py \
 The asset license terms are a project-owner decision and should receive legal
 review when appropriate. Phase 10 performs independent verification of the
 completed directory and ZIP and has not started yet.
+
+## Build the Fab primary Blender format
+
+Fab requires a recognized primary 3D format; an Additional Files ZIP alone is
+not sufficient. The master Blender source uses external relative texture paths,
+so do not upload it by itself. Generate a self-contained copy with all source
+textures packed into the `.blend`:
+
+```sh
+blender --background Blender/low-poly-cyberpunk-buildings-pack.blend \
+  --python-exit-code 2 \
+  --python automation/blender/build_fab_blender.py
+```
+
+Default outputs:
+
+```text
+dist/Fab_Formats/Blender/Cyberpunk_Building_Pack_v1.0.blend
+build/fab_blender_report.json
+```
+
+The script changes only Blender's in-memory data, saves to a temporary file,
+atomically installs the generated copy, and verifies that the source `.blend`
+hash did not change. Upload the generated `.blend` as the listing's Blender
+format. Keep the complete release ZIP under Additional Files for the individual
+GLBs, source textures, manifests, documentation, and Three.js example.
