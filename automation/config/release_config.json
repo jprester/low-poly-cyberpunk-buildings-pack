@@ -80,12 +80,33 @@
     "spacing_factor": 1.4,
     "ground_scale_factor": 10.0
   },
+  "fab_media": {
+    "resolution": [
+      1920,
+      1080
+    ],
+    "jpeg_quality": 90,
+    "maximum_file_size_bytes": 3000000,
+    "maximum_total_size_bytes": 25000000,
+    "frame_padding": 1.14,
+    "spacing_factor": 1.32,
+    "ground_scale_factor": 10.0,
+    "hero_assets": [
+      "SKY_02",
+      "SKY_05",
+      "COM_09",
+      "COM_10",
+      "COM_05",
+      "COM_03",
+      "COM_11"
+    ]
+  },
   "release": {
     "package_name": "Cyberpunk_Building_Pack",
     "version": "1.0",
     "source_blend": "Blender/low-poly-cyberpunk-buildings-pack.blend",
     "textures_directory": "Textures",
-    "license_file": "LICENSE.txt",
+    "license_file": "FAB_LICENSE_NOTICE.txt",
     "third_party_notices": "THIRD_PARTY_NOTICES.txt",
     "threejs_example": "examples/threejs"
   }

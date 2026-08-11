@@ -57,6 +57,7 @@ REQUIRED_SCRIPTS = (
     "automation/blender/export_assets.py",
     "automation/blender/render_previews.py",
     "automation/blender/render_collection_overviews.py",
+    "automation/blender/render_fab_media.py",
     "automation/scripts/generate_docs.py",
 )
 
@@ -163,6 +164,8 @@ def preflight(
     blender_path = find_blender(blender_override)
     npm_path_text = shutil.which("npm")
     npm_path = Path(npm_path_text).resolve() if npm_path_text else None
+    node_path_text = shutil.which("node")
+    node_path = Path(node_path_text).resolve() if node_path_text else None
 
     required_files = {
         "Configuration": config_path,
@@ -187,16 +190,24 @@ def preflight(
         errors.append("Blender executable was not found; use --blender or BLENDER_BIN")
     if npm_path is None:
         errors.append("npm executable was not found on PATH")
+    if node_path is None:
+        errors.append("Node.js executable was not found on PATH")
 
     final_name = f"{settings['package_name']}_v{settings['version']}"
     final_directory = (DIST_ROOT / final_name).resolve()
     final_zip = (DIST_ROOT / f"{final_name}.zip").resolve()
+    final_fab_media = (DIST_ROOT / "Fab_Media").resolve()
     require_inside(final_directory, DIST_ROOT, "Release directory")
     require_inside(final_zip, DIST_ROOT, "Release ZIP")
+    require_inside(final_fab_media, DIST_ROOT, "Fab media directory")
     if final_directory.exists() and not final_directory.is_dir():
         errors.append(f"Release directory path is not a directory: {display_path(final_directory)}")
     if final_zip.exists() and not final_zip.is_file():
         errors.append(f"Release ZIP path is not a file: {display_path(final_zip)}")
+    if final_fab_media.exists() and not final_fab_media.is_dir():
+        errors.append(
+            f"Fab media path is not a directory: {display_path(final_fab_media)}"
+        )
 
     paths = {
         "source_blend": source_blend,
@@ -206,8 +217,10 @@ def preflight(
         "third_party_notices": third_party_notices,
         "blender": blender_path or Path("blender"),
         "npm": npm_path or Path("npm"),
+        "node": node_path or Path("node"),
         "final_directory": final_directory,
         "final_zip": final_zip,
+        "final_fab_media": final_fab_media,
     }
     return errors, paths
 
@@ -275,8 +288,29 @@ def ignored_copy_names(_directory: str, names: List[str]) -> List[str]:
 
 def ensure_no_symlinks(path: Path, label: str) -> None:
     candidates = [path] if path.is_symlink() else []
-    if path.is_dir():
-        candidates.extend(item for item in path.rglob("*") if item.is_symlink())
+    if path.is_dir() and not path.is_symlink():
+        for directory, names, filenames in os.walk(path, followlinks=False):
+            directory_path = Path(directory)
+            retained_names = []
+            for name in names:
+                candidate = directory_path / name
+                if name in IGNORED_NAMES or any(
+                    name.endswith(suffix) for suffix in IGNORED_SUFFIXES
+                ):
+                    continue
+                if candidate.is_symlink():
+                    candidates.append(candidate)
+                    continue
+                retained_names.append(name)
+            names[:] = retained_names
+            for name in filenames:
+                if name in IGNORED_NAMES or any(
+                    name.endswith(suffix) for suffix in IGNORED_SUFFIXES
+                ):
+                    continue
+                candidate = directory_path / name
+                if candidate.is_symlink():
+                    candidates.append(candidate)
     if candidates:
         shown = ", ".join(display_path(item) for item in candidates[:3])
         raise ReleaseBuildError(f"{label} contains unsupported symbolic links: {shown}")
@@ -408,16 +442,21 @@ def create_zip(source: Path, destination: Path, archive_root: str) -> None:
 def replace_outputs_atomically(
     staging: Path,
     temporary_zip: Path,
+    fab_media: Path,
     final_directory: Path,
     final_zip: Path,
+    final_fab_media: Path,
 ) -> None:
     token = uuid.uuid4().hex
     directory_backup = DIST_ROOT / f".{final_directory.name}.{token}.backup"
     zip_backup = DIST_ROOT / f".{final_zip.name}.{token}.backup"
+    fab_media_backup = DIST_ROOT / f".{final_fab_media.name}.{token}.backup"
     moved_directory = False
     moved_zip = False
+    moved_fab_media = False
     installed_directory = False
     installed_zip = False
+    installed_fab_media = False
 
     try:
         if final_directory.exists():
@@ -426,18 +465,27 @@ def replace_outputs_atomically(
         if final_zip.exists():
             os.replace(final_zip, zip_backup)
             moved_zip = True
+        if final_fab_media.exists():
+            os.replace(final_fab_media, fab_media_backup)
+            moved_fab_media = True
 
         os.replace(staging, final_directory)
         installed_directory = True
         os.replace(temporary_zip, final_zip)
         installed_zip = True
+        os.replace(fab_media, final_fab_media)
+        installed_fab_media = True
     except Exception:
+        if installed_fab_media and final_fab_media.exists():
+            shutil.rmtree(final_fab_media)
         if installed_zip and final_zip.exists():
             final_zip.unlink()
         if installed_directory and final_directory.exists():
             shutil.rmtree(final_directory)
         if moved_zip and zip_backup.exists():
             os.replace(zip_backup, final_zip)
+        if moved_fab_media and fab_media_backup.exists():
+            os.replace(fab_media_backup, final_fab_media)
         if moved_directory and directory_backup.exists():
             os.replace(directory_backup, final_directory)
         raise
@@ -446,6 +494,8 @@ def replace_outputs_atomically(
             shutil.rmtree(directory_backup)
         if zip_backup.exists():
             zip_backup.unlink()
+        if fab_media_backup.exists():
+            shutil.rmtree(fab_media_backup)
 
 
 def blender_command(blender: Path, source_blend: Path, script: str, config_path: Path) -> List[str]:
@@ -506,8 +556,15 @@ def run_pipeline(
 
     run_command(
         report,
+        "render Fab marketplace media",
+        blender_command(paths["blender"], paths["source_blend"], REQUIRED_SCRIPTS[4], config_path),
+    )
+    load_pass_report(BUILD_ROOT / "fab_media_report.json", "Fab media rendering")
+
+    run_command(
+        report,
         "generate documentation",
-        [sys.executable, str(REPOSITORY_ROOT / REQUIRED_SCRIPTS[4])],
+        [sys.executable, str(REPOSITORY_ROOT / REQUIRED_SCRIPTS[5])],
     )
     load_pass_report(BUILD_ROOT / "documentation_report.json", "Documentation generation")
 
@@ -521,8 +578,22 @@ def run_pipeline(
     )
     run_command(
         report,
+        "type-check Three.js example",
+        [
+            str(paths["node"]),
+            str(threejs_work / "node_modules" / "typescript" / "bin" / "tsc"),
+            "--noEmit",
+        ],
+        cwd=threejs_work,
+    )
+    run_command(
+        report,
         "build Three.js example",
-        [str(paths["npm"]), "run", "build"],
+        [
+            str(paths["node"]),
+            str(threejs_work / "node_modules" / "vite" / "bin" / "vite.js"),
+            "build",
+        ],
         cwd=threejs_work,
     )
     shutil.rmtree(threejs_work / "node_modules")
@@ -538,8 +609,10 @@ def run_pipeline(
         replace_outputs_atomically(
             staging,
             temporary_zip,
+            BUILD_ROOT / "fab_media",
             paths["final_directory"],
             paths["final_zip"],
+            paths["final_fab_media"],
         )
         record_step(report, "publish generated outputs", "pass")
     finally:
@@ -552,6 +625,7 @@ def run_pipeline(
         "directory": display_path(paths["final_directory"]),
         "zip": display_path(paths["final_zip"]),
         "zip_size_bytes": paths["final_zip"].stat().st_size,
+        "fab_media_directory": display_path(paths["final_fab_media"]),
     }
 
 

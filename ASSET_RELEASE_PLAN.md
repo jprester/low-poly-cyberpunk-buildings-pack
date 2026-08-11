@@ -283,6 +283,13 @@ copying, and creates factual `RELEASE_NOTES.md` and `RELEASE_SUMMARY.json`
 files. Its missing-license failure path was tested before the approved asset
 license was added. The Three.js MIT license is preserved separately in
 `THIRD_PARTY_NOTICES.txt`.
+
+For Fab distribution, the configured license input is
+`FAB_LICENSE_NOTICE.txt`. It defers to the license selected on the Fab listing
+instead of adding separate buyer restrictions. The builder also renders five
+Fab-compliant 1920x1080 gallery JPEGs, validates their file-size limits, and
+installs them separately at `dist/Fab_Media/` so they are not bundled into the
+customer ZIP.
 Phase 10 — Release Verification
 
 Automate basic checks:

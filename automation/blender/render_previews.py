@@ -238,10 +238,23 @@ class PreviewStudio:
         return distance
 
     def render_to_path(self, output_path: Path, label: str) -> Dict[str, Any]:
-        """Atomically render the current temporary studio scene to a PNG."""
+        """Atomically render the current temporary studio scene to PNG or JPEG."""
+        suffix = output_path.suffix.lower()
+        if suffix == ".png":
+            file_format = "PNG"
+        elif suffix in {".jpg", ".jpeg"}:
+            file_format = "JPEG"
+        else:
+            raise ValueError(f"Unsupported preview image extension: {output_path.suffix}")
+
+        self.scene.render.image_settings.file_format = file_format
+        if file_format == "JPEG":
+            self.scene.render.image_settings.quality = int(
+                self.settings.get("jpeg_quality", 90)
+            )
         output_path.parent.mkdir(parents=True, exist_ok=True)
         descriptor, temporary_name = tempfile.mkstemp(
-            prefix=f".{label}.", suffix=".png", dir=str(output_path.parent)
+            prefix=f".{label}.", suffix=suffix, dir=str(output_path.parent)
         )
         os.close(descriptor)
         temporary_path = Path(temporary_name)
@@ -252,7 +265,7 @@ class PreviewStudio:
                 raise RuntimeError(f"Blender render returned {sorted(result)}")
             size_bytes = temporary_path.stat().st_size
             if size_bytes <= 0:
-                raise RuntimeError("Blender produced an empty preview PNG")
+                raise RuntimeError("Blender produced an empty preview image")
             os.chmod(temporary_path, 0o644)
             os.replace(temporary_path, output_path)
             return {

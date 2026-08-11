@@ -1,0 +1,13 @@
+LOW-POLY CYBERPUNK BUILDINGS PACK — FAB LICENSE NOTICE
+
+Copyright (c) 2026 Janko Prester. All rights reserved.
+
+This product is distributed through Fab under the license selected on its Fab
+product listing. For products acquired through Fab, the applicable Fab license
+governs use of the original 3D models, textures, materials, preview images,
+manifests, documentation, and example integration code included in this pack.
+
+This notice does not add to, replace, or modify the applicable Fab license.
+
+Third-party software remains subject to its own license terms. See
+THIRD_PARTY_NOTICES.txt for details.

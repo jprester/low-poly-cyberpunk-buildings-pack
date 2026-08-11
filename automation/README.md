@@ -184,6 +184,36 @@ Overview resolution and spacing are configured under `collection_overview` in
 `automation/config/release_config.json`. Use `--category Residential` after
 Blender's `--` separator to render only one configured category.
 
+## Render Fab marketplace media
+
+The Fab media renderer creates five exact 1920x1080 JPEGs from temporary
+copies of the source assets: a hero layout, a full-pack overview, and one
+overview per category. It verifies Fab's per-image and total gallery size
+limits and writes a machine-readable report.
+
+```sh
+blender --background Blender/low-poly-cyberpunk-buildings-pack.blend \
+  --python-exit-code 2 \
+  --python automation/blender/render_fab_media.py
+```
+
+Default outputs:
+
+```text
+build/
+├── fab_media_report.json
+└── fab_media/
+    ├── 01_hero.jpg
+    ├── 02_full_collection.jpg
+    ├── 03_residential_collection.jpg
+    ├── 04_commercial_collection.jpg
+    └── 05_skyscraper_collection.jpg
+```
+
+The complete release builder installs these files separately at
+`dist/Fab_Media/`; they are listing media and are not included in the customer
+download ZIP.
+
 ## Generate release documentation
 
 Documentation generation is a standalone Python step; Blender is not required.
@@ -209,8 +239,9 @@ Product and usage copy remains in `automation/templates/README.template.md`.
 Counts, category ranges, material lists, and GLB size statistics are generated
 from `build/release/Manifest/asset_manifest.json`.
 
-License terms are not generated automatically. Supply an approved
-`LICENSE.txt` before release packaging.
+License terms are not generated automatically. The Fab build uses the tracked
+`FAB_LICENSE_NOTICE.txt`, which defers to the license selected on the Fab
+listing and does not add separate buyer restrictions.
 
 ## Run the Three.js compatibility example
 
@@ -254,9 +285,10 @@ Run the non-destructive preflight first:
 python3 automation/scripts/build_release.py --preflight-only
 ```
 
-The approved asset license is tracked as `LICENSE.txt` at the repository root.
-`THIRD_PARTY_NOTICES.txt` separately preserves the Three.js MIT notice. You may
-point to an approved license stored elsewhere without copying it first:
+The Fab license notice is tracked as `FAB_LICENSE_NOTICE.txt` at the repository
+root. `THIRD_PARTY_NOTICES.txt` separately preserves the Three.js MIT notice.
+You may point to a different approved marketplace notice stored elsewhere
+without copying it first:
 
 ```sh
 python3 automation/scripts/build_release.py \
@@ -279,18 +311,21 @@ The builder then:
 2. Validates the Blender catalogue and stops on validation errors.
 3. Exports every GLB and the canonical JSON/CSV manifest.
 4. Renders individual previews and collection overviews.
-5. Generates release documentation.
-6. Builds the Three.js example from its lockfile in temporary build space.
-7. Copies the Blender source, source textures, approved asset license,
+5. Renders and validates Fab marketplace gallery images.
+6. Generates release documentation.
+7. Builds the Three.js example from its lockfile in temporary build space.
+8. Copies the Blender source, source textures, Fab license notice,
    third-party notices, and generated outputs into a temporary release
    directory.
-8. Generates `RELEASE_NOTES.md` and `RELEASE_SUMMARY.json`.
-9. Creates the ZIP and atomically installs both final outputs.
+9. Generates `RELEASE_NOTES.md` and `RELEASE_SUMMARY.json`.
+10. Creates the ZIP and atomically installs the package directory, ZIP, and
+    separate Fab media directory.
 
 Default outputs:
 
 ```text
 dist/
+├── Fab_Media/
 ├── Cyberpunk_Building_Pack_v1.0/
 └── Cyberpunk_Building_Pack_v1.0.zip
 ```
